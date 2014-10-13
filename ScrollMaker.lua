@@ -85,9 +85,8 @@ function FSM_EnchantScrollButton_OnEnter(self)
 	c = GRAY_FONT_COLOR;
 	local title = GetAddOnMetadata(addonName, "Title");
 	local version = GetAddOnMetadata(addonName, "Version");
-	local _, _, revision = string.find("$Revision: 739 $", "(%d+)");
 	
-	GameTooltip:AddDoubleLine(title, string.format("v%s (r%d)", version, revision), c.r, c.g, c.b, c.r, c.g, c.b);
+	GameTooltip:AddDoubleLine(title, string.format("v%s", version), c.r, c.g, c.b, c.r, c.g, c.b);
 	GameTooltip:Show();
 	
 end
