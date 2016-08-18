@@ -9,7 +9,7 @@ local VELLUM_ITEM_ID = 38682;
 function FSM_OnEvent(self, event, ...)
 
 	if (event == "ADDON_LOADED" and select(1,...) == "Blizzard_TradeSkillUI") then
-		hooksecurefunc("TradeSkillFrame_SetSelection", FSM_TradeSkillFrame_SetSelection);
+		hooksecurefunc(TradeSkillFrame.DetailsFrame, "RefreshDisplay", FSM_TradeSkillDetailsRefreshDisplay);
 	end
 		
 end
@@ -18,15 +18,16 @@ end
 -- Enchanting scroll button
 ------------------------------------------------------
 
-function FSM_TradeSkillFrame_SetSelection(id)
-	local skillName, _, _, _, altVerb = GetTradeSkillInfo(id);
-	if (altVerb == ENSCRIBE) then
+function FSM_TradeSkillDetailsRefreshDisplay()
+	local id = TradeSkillFrame.DetailsFrame.selectedRecipeID;
+	local recipeInfo = id and C_TradeSkillUI.GetRecipeInfo(id);
+	if (recipeInfo and recipeInfo.alternateVerb == ENSCRIBE) then
 		if (not FSM_EnchantScrollButton) then
 			FSM_CreateEnchantScrollButton();
 		end
 		FSM_EnchantScrollButton:Show();	
 		
-		if (FSM_CanEnchantScroll(id)) then
+		if (recipeInfo.numAvailable > 0 and GetItemCount(VELLUM_ITEM_ID) > 0) then
 			FSM_EnchantScrollButton:Enable();
 		else
 			FSM_EnchantScrollButton:Disable();
@@ -38,33 +39,12 @@ function FSM_TradeSkillFrame_SetSelection(id)
 	
 end
 
-function FSM_CanEnchantScroll(id)
-	local numReagents = GetTradeSkillNumReagents(id);
-	for i=1, numReagents, 1 do
-		local reagentName, reagentTexture, reagentCount, playerReagentCount = GetTradeSkillReagentInfo(id, i);
-		if ( playerReagentCount < reagentCount ) then
-			return false;
-		end
-	end
-	if (GetItemCount(VELLUM_ITEM_ID) == 0) then
-		return false;
-	end
-	return true;
-end
-
-function FSM_GetEnchantingSpellName()
-	if (not FSM_EnchantingSpellName) then
-		FSM_EnchantingSpellName = GetSpellInfo(ENCHANTING_SPELL_ID);
-	end
-	return FSM_EnchantingSpellName;
-end
-
 function FSM_CreateEnchantScrollButton()
-	FSM_EnchantScrollButton = CreateFrame("Button", "FSM_EnchantScrollButton", TradeSkillFrame, "MagicButtonTemplate");
+	FSM_EnchantScrollButton = CreateFrame("Button", "FSM_EnchantScrollButton", TradeSkillFrame.DetailsFrame, "MagicButtonTemplate");
 	
-	FSM_EnchantScrollButton:SetWidth(TradeSkillCreateButton:GetWidth());
-	FSM_EnchantScrollButton:SetHeight(TradeSkillCreateButton:GetHeight());
-	FSM_EnchantScrollButton:SetPoint("RIGHT", TradeSkillCreateButton, "LEFT",0,0);
+	FSM_EnchantScrollButton:SetWidth(TradeSkillFrame.DetailsFrame.CreateButton:GetWidth());
+	FSM_EnchantScrollButton:SetHeight(TradeSkillFrame.DetailsFrame.CreateButton:GetHeight());
+	FSM_EnchantScrollButton:SetPoint("RIGHT", TradeSkillFrame.DetailsFrame.CreateButton, "LEFT",0,0);
 	
 	FSM_EnchantScrollButton:SetText(CREATE_PROFESSION);
 	
@@ -92,7 +72,7 @@ function FSM_EnchantScrollButton_OnEnter(self)
 end
 
 function FSM_EnchantScrollButton_OnClick()
-	DoTradeSkill(TradeSkillFrame.selectedSkill);
+	C_TradeSkillUI.CraftRecipe(TradeSkillFrame.DetailsFrame.selectedRecipeID);
 	UseItemByName(VELLUM_ITEM_ID);
 end
 
