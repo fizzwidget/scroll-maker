@@ -16,6 +16,9 @@ USAGE: When an enchant is selected in the default Enchanting UI, a "Create" butt
 ------------------------------------------------------
 VERSION HISTORY
 
+v. 8.0 - 2018/08/04
+- Updated TOC to indicate compatibility with WoW Patch 8.0 and Battle for Azeroth.
+
 v. 7.0 - 2016/08/18
 - Updated for WoW Patch 7.0 and Legion.
 
